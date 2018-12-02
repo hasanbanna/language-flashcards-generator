@@ -3,6 +3,14 @@ from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
 import six
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-tlang", "--target_language", help="target language")
+args = parser.parse_args()
+
+# print (args.target_langauge);
+
 
 text = "Me voilà installée à Montpellier! J'habite avec une famille très gentille: Jacques et Marie Trapet et leurs enfants, Cecile et Juliette. Je trouve leur maison très belle, mais ils ne sont pas contents et ils cherchent une autre maison à la campagne, avec des chambres individuelles pour les enfants. Nous sommes très occupés ici."
 
@@ -28,7 +36,7 @@ def get_relevant_pos_from_text(text):
     relevant_tags = ('ADJ', 'ADV', 'NOUN', 'VERB')
 
     gender = ('N/A', 'FEMININE','MASCULINE', 'NEUTER')
-    
+
     relevant_content = []
     for token in tokens:
         if pos_tag[token.part_of_speech.tag] in relevant_tags:
@@ -67,11 +75,7 @@ def name_entities_from_text(text):
         print(u'{:<16}: {}'.format('wikipedia_url',
               entity.metadata.get('wikipedia_url', '-')))
 
-
-print(get_relevant_pos_from_text(text))
-
-
-# # 1. Input sentences, words
-# # 2. Pick out words
-# # 3. Get images related to the words
-# # 4. Get pronunciation for the words
+# 1. Input a sentence -> it must be a sentence
+# 2. Analyze syntax so I can pick out words from a sentence
+# 3. Get images related to the words
+# 4. Get pronunciation for the words using text to speech
