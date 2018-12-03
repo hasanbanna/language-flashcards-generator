@@ -2,17 +2,35 @@
 from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
+from google.cloud import texttospeech
 import six
 import argparse
+from google_images_download import google_images_download
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-tlang", "--target_language", help="target language")
-args = parser.parse_args()
+response = google_images_download.googleimagesdownload()
 
-# print (args.target_langauge);
+# parser = argparse.ArgumentParser()
+# parser.add_argument('-text', "--text", help="input text")
+# parser.add_argument("-tlang", "--target_language", help="target language")
+# args = parser.parse_args()
 
+# target_language = args.target_language
+text = "Je trouve leur maison très belle, mais ils ne sont pas contents et ils cherchent une autre maison à la campagne, avec des chambres individuelles pour les enfants"
 
-text = "Me voilà installée à Montpellier! J'habite avec une famille très gentille: Jacques et Marie Trapet et leurs enfants, Cecile et Juliette. Je trouve leur maison très belle, mais ils ne sont pas contents et ils cherchent une autre maison à la campagne, avec des chambres individuelles pour les enfants. Nous sommes très occupés ici."
+def generate_cloze_sentences(sentence, clozed_words):
+    cloze_sentences = []
+    for word in sentence.split(" "):
+        if(word in clozed_words):
+            cloze_sentences.append(sentence.replace(word,"{{c1::%s}}"%(word)))
+    return cloze_sentences
+
+clozed_words = ['voilà', 'installée', 'très', 'gentille']
+# arguments = {"keywords": ','.join(clozed_words), "limit":1, "format":'png'}
+# paths = response.download(arguments)
+# print(paths)
+clozed_sentences = generate_cloze_sentences(text, clozed_words)
+for cs in clozed_sentences:
+    print(cs)
 
 def get_relevant_pos_from_text(text):
     """Detects syntax in the text."""
@@ -66,16 +84,41 @@ def name_entities_from_text(text):
     entity_type = ('UNKNOWN', 'PERSON', 'LOCATION', 'ORGANIZATION',
                    'EVENT', 'WORK_OF_ART', 'CONSUMER_GOOD', 'OTHER')
 
+    entities_names = []
     for entity in entities:
-        print('=' * 20)
-        print(u'{:<16}: {}'.format('name', entity.name))
-        print(u'{:<16}: {}'.format('type', entity_type[entity.type]))
-        print(u'{:<16}: {}'.format('metadata', entity.metadata))
-        print(u'{:<16}: {}'.format('salience', entity.salience))
-        print(u'{:<16}: {}'.format('wikipedia_url',
-              entity.metadata.get('wikipedia_url', '-')))
+        if(entity.name not in entities_names):
+            entities_names.append(entity.name)
+    return entities_names
 
-# 1. Input a sentence -> it must be a sentence
-# 2. Analyze syntax so I can pick out words from a sentence
-# 3. Get images related to the words
-# 4. Get pronunciation for the words using text to speech
+
+
+# fr-FR
+def generate_speech_from_text(langauge_code, speaking_rate, filename):
+    # Instantiates a client
+    client = texttospeech.TextToSpeechClient()
+
+    # Set the text input to be synthesized
+    synthesis_input = texttospeech.types.SynthesisInput(text=text)
+
+    # Build the voice request, select the language code ("en-US") and the ssml
+    # voice gender ("neutral")
+    voice = texttospeech.types.VoiceSelectionParams(
+        language_code=language_code,
+        ssml_gender=texttospeech.enums.SsmlVoiceGender.FEMALE)
+
+    # Select the type of audio file you want returned
+    audio_config = texttospeech.types.AudioConfig(
+        audio_encoding=texttospeech.enums.AudioEncoding.MP3,
+        speaking_rate=speaking_rate)
+
+    # Perform the text-to-speech request on the text input with the selected
+    # voice parameters and audio file type
+    response = client.synthesize_speech(synthesis_input, voice, audio_config)
+
+    # The response's audio_content is binary.
+    with open('audio/+filename+'.mp3', 'wb') as out:
+        # Write the response to the output file.
+        out.write(response.audio_content)
+        print('Audio content written to file "output.mp3"')
+
+print(name_entities_from_text(text))
