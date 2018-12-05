@@ -3,6 +3,8 @@ from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
 from google.cloud import texttospeech
+from google.cloud import translate
+
 import six
 import argparse
 from google_images_download import google_images_download
@@ -17,20 +19,15 @@ response = google_images_download.googleimagesdownload()
 # target_language = args.target_language
 text = "Je trouve leur maison très belle, mais ils ne sont pas contents et ils cherchent une autre maison à la campagne, avec des chambres individuelles pour les enfants"
 
+"""
+For each word create a text to speech pronunciation along with the pronunciation of the sentence aswell as an extra.
+"""
 def generate_cloze_sentences(sentence, clozed_words):
     cloze_sentences = []
     for word in sentence.split(" "):
         if(word in clozed_words):
             cloze_sentences.append(sentence.replace(word,"{{c1::%s}}"%(word)))
     return cloze_sentences
-
-clozed_words = ['voilà', 'installée', 'très', 'gentille']
-# arguments = {"keywords": ','.join(clozed_words), "limit":1, "format":'png'}
-# paths = response.download(arguments)
-# print(paths)
-clozed_sentences = generate_cloze_sentences(text, clozed_words)
-for cs in clozed_sentences:
-    print(cs)
 
 def get_relevant_pos_from_text(text):
     """Detects syntax in the text."""
@@ -60,8 +57,9 @@ def get_relevant_pos_from_text(text):
         if pos_tag[token.part_of_speech.tag] in relevant_tags:
             if(token.part_of_speech.proper == 1): # if proper noun(1) then skip
                 continue
-            relevant_content.append(token.text.content)
-            print (gender[token.part_of_speech.gender], token.text.content)
+            if(token.text.content not in relevant_content):
+                relevant_content.append(token.text.content)
+            # print (gender[token.part_of_speech.gender], token.text.content)
     return relevant_content
 
 def name_entities_from_text(text):
@@ -116,9 +114,26 @@ def generate_speech_from_text(langauge_code, speaking_rate, filename):
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
     # The response's audio_content is binary.
-    with open('audio/+filename+'.mp3', 'wb') as out:
+    with open('audio/'+filename+'.mp3', 'wb') as out:
         # Write the response to the output file.
         out.write(response.audio_content)
         print('Audio content written to file "output.mp3"')
 
-print(name_entities_from_text(text))
+# print(name_entities_from_text(text))
+
+clozed_words = get_relevant_pos_from_text(text)
+# arguments = {"keywords": ','.join(clozed_words), "limit":1, "format":'png'}
+# paths = response.download(arguments)
+# print(paths)
+clozed_sentences = generate_cloze_sentences(text, clozed_words)
+# print(clozed_sentences)
+for cs in clozed_sentences:
+    print(cs)
+
+def translate_text(text, target_language):
+    # Instantiates a client
+    translate_client = translate.Client()
+    target = target_language
+    translation = translate_client.translate(text, target_language=target)
+    return translation['translatedText']
+print(translate_text(text, 'en'));
