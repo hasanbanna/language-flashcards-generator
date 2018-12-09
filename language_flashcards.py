@@ -125,9 +125,16 @@ def translate_text(text, target_language):
 def generate_context_images(context_words):
     from google_images_download import google_images_download
     response = google_images_download.googleimagesdownload()
-    arguments = {"keywords":"Polar bears,baloons,Beaches","limit":20,"print_urls":True}   #creating list of arguments
-    paths = response.download(arguments)   #passing the arguments to the function
-    print(paths)
+    arguments = {
+        "keywords":','.join(context_words),
+        "limit":1,
+        "format": "png",
+        "prefix": "french_word",
+        "size": "medium",
+        "type": "photo",
+        "no_directory": True}
+    response.download(arguments)   #passing the arguments to the function
+    print ('---downloading images complete---')
 
 # Translate the target language to source language
 def translate_text(text, target_language):

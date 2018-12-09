@@ -4,7 +4,7 @@ from language_flashcards import *
 # Each word is unique
 # Each word is processed in order
 # TODO: change source / taget language naming confusing
-
+# TODO: google_images_download library should allow the image_name to be the same as the keyword
 
 # Get target language
 source_langauge = 'en'
@@ -17,23 +17,21 @@ target_language_sentence = "Je trouve leur maison très belle, mais ils ne sont 
 clozed_word_dict = get_relevant_pos_data_from_text(target_language_sentence)
 
 # Get named entities from the sentence
-named_entities = name_entities_from_sentence(target_language_sentence)
-
+clozed_word_dict['context_images'] = name_entities_from_sentence(target_language_sentence)
 # for each entity generate a contextual image
-print("---Generating image files---")
-# named_entities_images = generate_images(named_entities)
-
+print("---downloading image files---")
+generate_context_images(clozed_word_dict['context_images'])
 #  generate an audio for the sentence for each clozed word
-print("---Generating audio files---")
-clozed_word_dict['sentence_audio'] = []
-clozed_word_dict['sentence_audio'].append('[sound:{}.mp3]'.format(trim_sentence(target_language_sentence, 20)))
-generate_speech_from_text('fr-FR', 0.8, target_language_sentence)
+# print("---downloading audio files---")
+# clozed_word_dict['sentence_audio'] = []
+# clozed_word_dict['sentence_audio'].append('[sound:{}.mp3]'.format(trim_sentence(target_language_sentence, 20)))
+# generate_speech_from_text('fr-FR', 0.8, target_language_sentence)
 
-clozed_word_dict['word_audio'] = []
-for word in get_words(clozed_word_dict['part_of_speech']):
-  clozed_word_dict['word_audio'].append('[sound:{}.mp3]'.format(word))
-  generate_speech_from_text('fr-FR', 0.8, word)
-
+# clozed_word_dict['word_audio'] = []
+# for word in get_words(clozed_word_dict['part_of_speech']):
+#   clozed_word_dict['word_audio'].append('[sound:{}.mp3]'.format(word))
+#   generate_speech_from_text('fr-FR', 0.8, word)
+print('---downloading audio files complete---')
 # # for cloze_word in clozed_word_dict:
 #   # Clozed Sentence
 #   # print(generate_cloze_deletion(target_language_sentence, cloze_word['word']))
