@@ -3,7 +3,7 @@ from language_flashcards import *
 # Assumptions
 # Each word is unique
 # Each word is processed in order
-# TODO: change source / taget language naming confusing
+# TODO: change source / target language naming confusing
 # TODO: google_images_download library should allow the image_name to be the same as the keyword
 
 # Get target language

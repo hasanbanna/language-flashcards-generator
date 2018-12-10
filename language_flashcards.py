@@ -129,8 +129,8 @@ def generate_context_images(context_words):
         "keywords":','.join(context_words),
         "limit":1,
         "format": "png",
-        "prefix": "french_word",
         "size": "medium",
+        "no_numbering": True,
         "type": "photo",
         "no_directory": True}
     response.download(arguments)   #passing the arguments to the function
