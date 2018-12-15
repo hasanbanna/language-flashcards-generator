@@ -103,11 +103,6 @@ def generate_speech_from_text(lang, speaking_rate, txt):
     with open('{}.mp3'.format(txt), 'wb') as out:
         # Write the response to the output file.
         out.write(response.audio_content)
-    #
-
-# arguments = {"keywords": ','.join(clozed_words), "limit":1, "format":'png'}
-# paths = response.download(arguments)
-# print(paths)
 
 def get_words(words_dict):
     words = []
