@@ -98,8 +98,8 @@ def generate_speech_from_text(lang, speaking_rate, txt):
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
     # The response's audio_content is binary.
-    if(len(txt) >= 20):
-        txt = trim_sentence(txt, 20)
+    if(len(txt) >= 10):
+        txt = trim_sentence(txt, 10)
     with open('{}.mp3'.format(txt), 'wb') as out:
         # Write the response to the output file.
         out.write(response.audio_content)
