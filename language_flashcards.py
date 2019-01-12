@@ -3,9 +3,9 @@ from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
 from google.cloud import texttospeech
-from google.cloud import translate
+# from google.cloud import translate
 
-import six
+# import six
 # Might use argparse to create command line tool
 # target_language = args.target_language
 
